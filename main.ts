@@ -1,22 +1,29 @@
-// One-Liner Marathon — a joke about a calendar that schedules its own punchline.
-// Writes the line to $MAKEFUN_OUTPUT_DIR/entry.txt.
+// One-Liner Marathon: the calendar invites you to a meeting about burnout.
+// The line goes to $MAKEFUN_OUTPUT_DIR/entry.txt.
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-// The joke: a meeting about burnout that you are too burned out to attend.
-const JOKE =
-  "My calendar invited me to a meeting about my burnout, so I declined — I was too burned out to attend.";
+const FIRST_HALF = "My calendar invited me to a meeting about my burnout,";
+const SECOND_HALF = "so I declined — I was too burned out to attend.";
 
-function emit(): void {
-  // Gate: the entry must be 1 to 280 characters of UTF-8 text.
-  if (JOKE.length < 1 || JOKE.length > 280) {
-    throw new Error(`joke is ${JOKE.length} characters, outside the 1-280 gate`);
-  }
-  const target = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
-  if (!existsSync(target)) {
-    mkdirSync(target, { recursive: true });
-  }
-  writeFileSync(join(target, "entry.txt"), JOKE, "utf8");
+// The two halves join on a single space.
+function assemble(): string {
+  return `${FIRST_HALF} ${SECOND_HALF}`;
 }
 
-emit();
+function checkLength(text: string): void {
+  const n = text.length;
+  if (n < 1 || n > 280) {
+    throw new Error(`entry is ${n} chars; the marathon gate is 1-280`);
+  }
+}
+
+function main(): void {
+  const line = assemble();
+  checkLength(line);
+  const dir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "entry.txt"), line, "utf8");
+}
+
+main();
